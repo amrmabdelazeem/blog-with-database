@@ -22,7 +22,17 @@ const dbPwd = process.env.MONGO_PWD;
 dotenv.config();
 
 var url = process.env.MONGO_URL;
-mongoose.connect(url);
+const connectDB = async () => {
+  try {
+    const conn = await mongoose.connect(url);
+    console.log(`MongoDB Connected: ${conn.connection.host}`);
+  } catch (error) {
+    console.log(error);
+    process.exit(1);
+  }
+}
+
+
 
 const postSchema = new mongoose.Schema({
   title: String,
@@ -83,7 +93,9 @@ app.get("/posts/:postId", function(req, res){
 
 
 
-
-app.listen(process.env.PORT, function() {
-  console.log("Server started on port 3000");
+//Connect to the database before listening
+connectDB().then(() => {
+  app.listen(process.env.PORT, () => {
+      console.log("listening for requests");
+  })
 });
